@@ -1,0 +1,66 @@
+[project.scripts]
+mxw-sort = "mxw_sort.cli:app"
+
+[tool.setuptools]
+packages = ["mxw_sort"]
+
+[project]
+name = "mxw-sort"
+version = "0.1.0"
+description = "Internal pipeline for Maxwell .raw.h5 → SpikeInterface preprocessing → Kilosort4 sorting → QC + folder mirrored outputs"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+license = { text = "Internal / Lab Use Only" }
+
+authors = [
+  { name = "Andrew Chinn" }
+]
+
+dependencies = [
+  # Core
+  "numpy",
+  "scipy",
+  "h5py",
+  "pandas",
+  "scikit-learn",
+  "numba",
+
+  # SpikeInterface
+  "spikeinterface",
+  "neo",
+  "probeinterface",
+  "zarr",
+  "kilosort",
+
+
+  # Utilities and QC
+  "matplotlib",
+  "tqdm",
+  "pyyaml",
+  "packaging",
+  "psutil",
+  "cloudpickle",
+  "typer",
+
+  # CLI
+  "python-dotenv",
+]
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "ruff",
+  "ipython",
+]
+
+[tool.uv]
+package = true
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
