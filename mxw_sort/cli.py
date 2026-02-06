@@ -1,7 +1,7 @@
 from pathlib import Path
 import typer
 from .config import PipelineConfig
-from .pipeline import process_h5
+from .pipeline import process_h5, process_directory
 
 app = typer.Typer(add_completion=False)
 
@@ -31,7 +31,6 @@ def run(
     skip_existing: bool = typer.Option(True, "--skip-existing/--no-skip-existing", help="Skip wells with existing KS4 outputs"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Print actions without doing any work"),
 ):
-
     # Interpret dur_s=0 as "just run the whole recording"
     dur = None if float(dur_s) == 0 else float(dur_s)
 
@@ -48,15 +47,27 @@ def run(
     out.mkdir(parents=True, exist_ok=True)
 
     # Process wells (execution parameters are now separated from processing parameters)
-    process_h5(
-        h5_path=h5,
-        out_root=out,
-        cfg=cfg,
-        wells=parse_wells(wells),
-        skip_existing=skip_existing,
-        dry_run=dry_run,
-        only_well=only_well,
-    )
+    h5_resolved = Path(h5)
+    if h5_resolved.is_dir():
+        process_directory(
+            root_dir=h5_resolved,
+            out_root=out,
+            cfg=cfg,
+            well=parse_wells(wells),
+            skip_existing=skip_existing,
+            dry_run=dry_run,
+            only_well=only_well,
+        )
+    else:
+        process_h5(
+            h5_path=h5,
+            out_root=out,
+            cfg=cfg,
+            wells=parse_wells(wells),
+            skip_existing=skip_existing,
+            dry_run=dry_run,
+            only_well=only_well,
+        )
 
 if __name__ == "__main__":
     app()

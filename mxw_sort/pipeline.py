@@ -145,3 +145,38 @@ def process_h5(
             skip_existing=skip_existing,
             dry_run=dry_run,
         )
+
+
+# Recursively finds all .h5 files under a root directory and processes each one
+# Output directories mirror the input directory structure
+def process_directory(
+    root_dir: Path,
+    out_root: Path,
+    cfg: PipelineConfig,
+    wells: tuple[int, ...] | None = None,
+    skip_existing: bool = True,
+    dry_run: bool = False,
+    only_well: int | None = None,
+):
+    h5_files = sorted(root_dir.rglob("*.h5"))
+    if not h5_files:
+        print(f"No .h5 files found under {root_dir}")
+        return
+
+    print(f"Found {len(h5_files)} .h5 file(s) under {root_dir}:")
+    for f in h5_files:
+        print(f"  {f}")
+    print()
+
+    for h5_file in h5_files:
+        file_out = out_root / h5_file.relative_to(root_dir).parent
+        file_out.mkdir(parents=True, exist_ok=True)
+        process_h5(
+            h5_path=str(h5_file),
+            out_root=file_out,
+            cfg=cfg,
+            wells=wells,
+            skip_existing=skip_existing,
+            dry_run=dry_run,
+            only_well=only_well,
+        )

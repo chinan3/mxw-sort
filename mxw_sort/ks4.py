@@ -1,6 +1,7 @@
 from pathlib import Path
 from kilosort import run_kilosort, DEFAULT_SETTINGS
 
+# Runs KS4
 def run_ks4(
     bin_file: Path,
     probe_path: Path,

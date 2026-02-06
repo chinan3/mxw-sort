@@ -14,7 +14,6 @@ def write_binary(
     dtype: str = DEFAULT_DTYPE,
     chunk_duration: str = DEFAULT_CHUNK_DURATION
 ):
-
     sc.write_binary_recording(
         rec,
         file_paths=str(bin_path),
