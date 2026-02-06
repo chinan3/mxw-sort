@@ -13,31 +13,6 @@ def _ks4_done(ks_dir: Path) -> bool:
     # dummy way to check if ks4 has completed its run
     return (ks_dir / "spike_times.npy").exists() and (ks_dir / "spike_clusters.npy").exists()
 
-'''
-Modular single-well processing pipeline, wells run serially.
-
-But what are we looking at?
-
-Pipeline stages:
-    1. Read the Maxwell recording and apply preprocessing
-    2. Export to binary format for speed/ease of reading by KS. Alongside it, export the recording probe geometry
-    3. Call/run Kilosort4
-    4. Generate a handful of computationally cheap QC plots. KS4 will also create its own QC plots. (Does that make this step redundant??)
-
-Args:
-    h5_path: Path to Maxwell .raw.h5 file
-    out_root: Root dir for outputs 
-    h5_path: Path to Maxwell .raw.h5 file (creates well00X subdirectories)
-    cfg: Pipeline configuration
-    well_idx: Well index (0-5)
-    skip_existing: Skip if KS4 outputs already exist
-    dry_run: Print only actions, without executing
-        
-Raises:
-    FileNotFoundError: If the h5_path doesn't exist
-    ValueError: If well_idx is invalid
-'''
-
 def process_one_well(
     h5_path: str,
     out_root: Path,
@@ -46,6 +21,29 @@ def process_one_well(
     skip_existing: bool = True,
     dry_run: bool = False,
 ):
+    """
+    Modular single-well processing pipeline, wells run serially.
+
+    But what are we looking at?
+
+    Pipeline stages:
+        1. Read the Maxwell recording and apply preprocessing
+        2. Export to binary format for speed/ease of reading by KS. Alongside it, export the recording probe geometry
+        3. Call/run Kilosort4
+        4. Generate a handful of computationally cheap QC plots. KS4 will also create its own QC plots. (Does that make this step redundant??)
+
+    Args:
+        h5_path: Path to Maxwell .raw.h5 file
+        out_root: Root dir for outputs 
+        cfg: Pipeline configuration
+        well_idx: Well index (0-5)
+        skip_existing: Skip if KS4 outputs already exist
+        dry_run: Print only actions, without executing
+            
+    Raises:
+        FileNotFoundError: If the h5_path doesn't exist
+        ValueError: If well_idx is invalid
+    """
     stream = f"well{well_idx:03d}"
 
     well_dir = out_root / stream
@@ -114,7 +112,7 @@ def process_one_well(
     )
 
     # QC
-    dur_s_processed = cfg.dur_s if cfg.dur_s is not None else None
+    dur_s_processed = cfg.dur_s if cfg.dur_s is not None else None # redundant?
     write_qc(ks_dir=ks_dir, qc_dir=qc_dir, fs_hz=float(fs_hz), dur_s_processed=dur_s_processed)
 
 # Process multiple wells from a Maxwell H5 File

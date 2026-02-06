@@ -6,7 +6,7 @@ from .pipeline import process_h5, process_directory
 app = typer.Typer(add_completion=False)
 
 # Decodes user-input well selection from CLI. None triggers well auto-detection 
-def parse_wells(s: str | None) -> tuple[int, ...] | None:
+def parse_wells(s: str | None) -> tuple[int, ...] | None: # Only works in Python 3.10+
     if s is None or s.strip().lower() == "auto":
         return None
     s = s.strip()

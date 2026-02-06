@@ -5,7 +5,7 @@ def read_maxwell(h5_path: str, stream_name: str):
 
     return se.MaxwellRecordingExtractor(h5_path, stream_name=stream_name)
 
-# Auto-detects available wells in a Maxwell H5 file, returns a tuple of well indicies
+# Auto-detects available wells in a Maxwell H5 file, returns a tuple of well indices
 def get_available_wells(h5_path: str) -> tuple[int, ...]:
 
     # MaxwellRecordingExtractor can list available streams
@@ -25,6 +25,6 @@ def get_available_wells(h5_path: str) -> tuple[int, ...]:
                     continue
 
         return tuple(sorted(wells)) if wells else (0, 1, 2, 3, 4, 5)
-    except Exception:
+    except Exception: # Could allow silent errors as implimented. FUTURE: Add detailed logs and specific exceptions
         # Default to 6 wells if detection fails
         return (0, 1, 2, 3, 4, 5)
