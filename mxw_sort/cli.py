@@ -1,7 +1,7 @@
 from pathlib import Path
 import typer
 from .config import PipelineConfig
-from .pipeline import process_h5, process_directory
+from .pipeline import process_h5, process_directory, process_directory_flat
 
 app = typer.Typer(add_completion=False)
 
@@ -28,6 +28,7 @@ def run(
     bp_max_frac_nyq: float = typer.Option(0.9, "--bp-max-frac-nyq", help="Bandpass max as fraction of Nyquist"),
     ks4_hp: float = typer.Option(1.0, "--ks4-highpass-cutoff", help="KS4 highpass cutoff (1.0 = disabled)"),
     ks4_batch_size: int = typer.Option(60000, "--ks4-batch-size", help="KS4 batch size"),
+    flat: bool = typer.Option(False, "--flat", help="Flat directory mode: each h5 file gets its own output folder named after the file"),
     skip_existing: bool = typer.Option(True, "--skip-existing/--no-skip-existing", help="Skip wells with existing KS4 outputs"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Print actions without doing any work"),
 ):
@@ -49,15 +50,26 @@ def run(
     # Process wells (execution parameters are now separated from processing parameters)
     h5_resolved = Path(h5)
     if h5_resolved.is_dir():
-        process_directory(
-            root_dir=h5_resolved,
-            out_root=out,
-            cfg=cfg,
-            wells=parse_wells(wells),
-            skip_existing=skip_existing,
-            dry_run=dry_run,
-            only_well=only_well,
-        )
+        if flat:
+            process_directory_flat(
+                root_dir=h5_resolved,
+                out_root=out,
+                cfg=cfg,
+                wells=parse_wells(wells),
+                skip_existing=skip_existing,
+                dry_run=dry_run,
+                only_well=only_well,
+            )
+        else:
+            process_directory(
+                root_dir=h5_resolved,
+                out_root=out,
+                cfg=cfg,
+                wells=parse_wells(wells),
+                skip_existing=skip_existing,
+                dry_run=dry_run,
+                only_well=only_well,
+            )
     else:
         process_h5(
             h5_path=h5,

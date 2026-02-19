@@ -195,3 +195,45 @@ def process_directory(
             dry_run=dry_run,
             only_well=only_well,
         )
+
+
+# Flat directory mode: all h5 files are in one folder with unique names.
+# Output folders are named after each file's stem (e.g. "recording_001.raw.h5" -> "recording_001.raw/")
+def process_directory_flat(
+    root_dir: Path,
+    out_root: Path,
+    cfg: PipelineConfig,
+    wells: tuple[int, ...] | None = None,
+    skip_existing: bool = True,
+    dry_run: bool = False,
+    only_well: int | None = None,
+):
+    h5_files = sorted(root_dir.glob("*.h5"))
+    if not h5_files:
+        print(f"No .h5 files found in {root_dir}")
+        return
+
+    print(f"[FLAT] Found {len(h5_files)} .h5 file(s) in {root_dir}:")
+    for f in h5_files:
+        try:
+            detected = get_available_wells(str(f))
+            stream = f"well{detected[0]:03d}" if detected else "well000"
+            dur = get_well_duration_s(str(f), stream)
+            print(f"  {f.name}  ({dur:.1f}s)")
+        except Exception:
+            print(f"  {f.name}")
+    print()
+
+    for h5_file in h5_files:
+        # Use the file stem (minus .h5) as the output subdirectory
+        file_out = out_root / h5_file.stem
+        file_out.mkdir(parents=True, exist_ok=True)
+        process_h5(
+            h5_path=str(h5_file),
+            out_root=file_out,
+            cfg=cfg,
+            wells=wells,
+            skip_existing=skip_existing,
+            dry_run=dry_run,
+            only_well=only_well,
+        )
