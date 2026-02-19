@@ -1,8 +1,9 @@
 from pathlib import Path
+import time
 import numpy as np
 
 from .config import PipelineConfig
-from .io_maxwell import read_maxwell, get_available_wells
+from .io_maxwell import read_maxwell, get_available_wells, get_well_duration_s
 from .preprocess import unsigned_to_signed, slice_seconds, bandpass_to_frac_nyq
 from .export import write_binary, write_probe_json, write_meta_json
 from .ks4 import run_ks4
@@ -63,11 +64,18 @@ def process_one_well(
     print(f"[RUN] {h5_path} {stream} -> {well_dir}")
 
     if dry_run:
+        try:
+            dur = get_well_duration_s(h5_path, stream)
+            print(f"  duration: {dur:.1f}s")
+        except Exception:
+            print("  duration: unknown")
         print("  (dry-run) would write:", bin_path)
         print("  (dry-run) would write:", probe_path)
         print("  (dry-run) would run ks4 into:", ks_dir)
         print("  (dry-run) would write qc into:", qc_dir)
         return
+
+    t0 = time.time()
 
     prep_dir.mkdir(parents=True, exist_ok=True)
     ks_dir.mkdir(parents=True, exist_ok=True)
@@ -114,6 +122,9 @@ def process_one_well(
     # QC
     dur_s_processed = cfg.dur_s if cfg.dur_s is not None else None # redundant?
     write_qc(ks_dir=ks_dir, qc_dir=qc_dir, fs_hz=float(fs_hz), dur_s_processed=dur_s_processed)
+
+    elapsed = time.time() - t0
+    print(f"[DONE] {stream} in {elapsed:.1f}s")
 
 # Process multiple wells from a Maxwell H5 File
 # Multiple wells could be run in parallel in the future. ProcessPoolExecutor would be added around here.
@@ -163,7 +174,13 @@ def process_directory(
 
     print(f"Found {len(h5_files)} .h5 file(s) under {root_dir}:")
     for f in h5_files:
-        print(f"  {f}")
+        try:
+            detected = get_available_wells(str(f))
+            stream = f"well{detected[0]:03d}" if detected else "well000"
+            dur = get_well_duration_s(str(f), stream)
+            print(f"  {f}  ({dur:.1f}s)")
+        except Exception:
+            print(f"  {f}")
     print()
 
     for h5_file in h5_files:

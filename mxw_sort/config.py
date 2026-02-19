@@ -6,7 +6,7 @@ class PipelineConfig:
 
     # Time selection
     start_s: float = 0.0
-    dur_s: float | None = 30.0   # None means full recording
+    dur_s: float | None = 30   # None means full recording
 
     # Preprocessing
     bp_min_hz: float = 300.0

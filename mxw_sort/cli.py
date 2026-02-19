@@ -53,7 +53,7 @@ def run(
             root_dir=h5_resolved,
             out_root=out,
             cfg=cfg,
-            well=parse_wells(wells),
+            wells=parse_wells(wells),
             skip_existing=skip_existing,
             dry_run=dry_run,
             only_well=only_well,
