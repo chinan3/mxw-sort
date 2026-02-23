@@ -95,4 +95,4 @@ For each well in an `.h5` file:
 
 ## License
 
-Internal / Lab Use Only
+GNU General Public License v3.0
