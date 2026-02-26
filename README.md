@@ -10,7 +10,7 @@ Pipeline for Maxwell `.raw.h5` recordings: SpikeInterface preprocessing, Kilosor
 ## Installation
 
 ```bash
-git clone <repo-url> && cd mxw-sort
+git clone https://github.com/chinan3/mxw-sort && cd mxw-sort
 uv sync        # or: pip install -e .
 ```
 
