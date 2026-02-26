@@ -59,6 +59,7 @@ mxw-sort run path/to/data.raw.h5 --out results/ --dry-run
 | `--ks4-batch-size` | `60000` | KS4 batch size |
 | `--skip-existing / --no-skip-existing` | `True` | Skip wells with existing KS4 outputs |
 | `--dry-run` | `False` | Print actions without executing |
+| `--flat` | `False` | Run on flat input directories where all .h5 files are uniquely named and in the same folder (non-recursive) |
 
 ## Pipeline stages
 
