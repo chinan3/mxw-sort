@@ -19,7 +19,7 @@ uv sync        # or: pip install -e .
 ### Single file
 
 ```bash
-mxw-sort run path/to/data.raw.h5 --out results/
+mxw-sort path/to/data.raw.h5 --out results/
 ```
 
 ### Directory (batch)
